@@ -5,19 +5,61 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="https://public-frontend-cos.metadl.com/mgx/img/favicon.png" type="image/png">
-  <title>LevelUp - Turn Your Life Into a Game</title>
-  <meta name="description" content="Transform your daily habits into an RPG adventure. Complete quests, earn XP, level up skills, and compete on leaderboards." />
-  <meta name="author" content="MGX" />
+  <title>LevelUp - Gamify Your Life with AI | Turn Habits into Quests</title>
+  <meta name="description" content="Transform your daily habits into an epic RPG adventure with AI-powered coaching. Complete quests, earn XP, level up skills, compete on leaderboards, and achieve your goals with personalized AI guidance powered by Llama 3.1." />
+  <meta name="author" content="GAMILFY" />
+  <meta name="keywords" content="gamification, habit tracker, productivity, RPG, AI coach, Llama 3.1, quest tracker, skill development, personal growth" />
 
-  <meta property="og:title" content="LevelUp - Gamify Your Life" />
-  <meta property="og:description" content="Turn your life into an RPG. Complete quests, earn XP, level up skills, and compete with friends." />
+  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
+  <meta property="og:title" content="LevelUp - Gamify Your Life with AI" />
+  <meta property="og:description" content="Turn your life into an RPG with AI-powered coaching. Complete quests, earn XP, level up skills, and compete with friends. Powered by Llama 3.1." />
+  <meta property="og:image" content="https://public-frontend-cos.metadl.com/mgx/img/favicon.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LevelUp - Gamify Your Life with AI" />
+  <meta name="twitter:description" content="Transform habits into quests with AI coaching. Level up your life!" />
+  <meta name="twitter:image" content="https://public-frontend-cos.metadl.com/mgx/img/favicon.png" />
 
   <style>
     body {
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, rgb(79, 70, 229), rgb(6, 182, 212));
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(to bottom, rgb(99, 102, 241), rgb(34, 211, 238));
+    }
+
+    /* Loading animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    #root {
+      animation: fadeIn 0.3s ease-in;
     }
   </style>
 </head>

@@ -3,6 +3,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { BottomNav, SideNav } from './components/GameUI';
+import { AIAssistant } from './components/AIAssistant';
 import Dashboard from './pages/Dashboard';
 import Quests from './pages/Quests';
 import Profile from './pages/Profile';
@@ -35,6 +36,9 @@ const App = () => (
 
           {/* Mobile Bottom Nav */}
           <BottomNav />
+
+          {/* AI Assistant Floating Button */}
+          <AIAssistant />
         </div>
       </BrowserRouter>
     </TooltipProvider>

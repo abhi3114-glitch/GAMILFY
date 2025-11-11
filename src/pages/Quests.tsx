@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/components/ui/card';
 import { completeQuest, undoQuestCompletion, QUEST_XP } from '@/lib/gameEngine';
-import { Plus, Filter, Dumbbell, Brain, Target, Users, DollarSign } from 'lucide-react';
+import { generateQuestSuggestions, isAIConfigured } from '@/lib/aiService';
+import { Plus, Filter, Dumbbell, Brain, Target, Users, DollarSign, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const SKILL_ICONS = {
@@ -20,12 +22,21 @@ const SKILL_ICONS = {
   finance: DollarSign,
 };
 
+interface QuestSuggestion {
+  title: string;
+  description: string;
+  skill: SkillType;
+  size: QuestSize;
+}
+
 export default function Quests() {
   const [quests, setQuests] = useState(storage.getQuests());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
   const [filterSkill, setFilterSkill] = useState<SkillType | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'completed'>('all');
+  const [aiSuggestions, setAiSuggestions] = useState<QuestSuggestion[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   // Form state
   const [title, setTitle] = useState('');
@@ -50,6 +61,28 @@ export default function Quests() {
     setDueDate('');
     setIsRecurring(false);
     setEditingQuest(null);
+  };
+
+  const loadAISuggestions = async () => {
+    const user = storage.getUser();
+    if (!user || !isAIConfigured()) return;
+
+    setLoadingSuggestions(true);
+    try {
+      const skills = storage.getSkills();
+      const recentQuests = quests.slice(0, 10);
+      const suggestions = await generateQuestSuggestions({
+        skills,
+        userLevel: user.level,
+        recentQuests,
+      });
+      setAiSuggestions(suggestions);
+    } catch (error) {
+      console.error('Failed to load AI suggestions:', error);
+      toast.error('Failed to load AI suggestions');
+    } finally {
+      setLoadingSuggestions(false);
+    }
   };
 
   const handleCreateQuest = () => {
@@ -88,6 +121,14 @@ export default function Quests() {
     setQuests(storage.getQuests());
     setDialogOpen(false);
     resetForm();
+  };
+
+  const handleUseSuggestion = (suggestion: QuestSuggestion) => {
+    setTitle(suggestion.title);
+    setDescription(suggestion.description);
+    setSkill(suggestion.skill);
+    setSize(suggestion.size);
+    setAiSuggestions([]);
   };
 
   const handleEdit = (quest: Quest) => {
@@ -152,7 +193,10 @@ export default function Quests() {
           open={dialogOpen}
           onOpenChange={open => {
             setDialogOpen(open);
-            if (!open) resetForm();
+            if (!open) {
+              resetForm();
+              setAiSuggestions([]);
+            }
           }}
         >
           <DialogTrigger asChild>
@@ -161,11 +205,63 @@ export default function Quests() {
               New Quest
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingQuest ? 'Edit Quest' : 'Create New Quest'}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {/* AI Suggestions */}
+              {isAIConfigured() && !editingQuest && (
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={loadAISuggestions}
+                    disabled={loadingSuggestions}
+                  >
+                    {loadingSuggestions ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Generating AI Suggestions...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Get AI Quest Suggestions
+                      </>
+                    )}
+                  </Button>
+                  {aiSuggestions.length > 0 && (
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">AI Suggestions (Click to use)</Label>
+                      {aiSuggestions.map((suggestion, index) => (
+                        <Card
+                          key={index}
+                          className="p-3 cursor-pointer hover:bg-white/10 transition-all border-indigo-500/20"
+                          onClick={() => handleUseSuggestion(suggestion)}
+                        >
+                          <div className="flex items-start gap-2">
+                            <Sparkles className="h-4 w-4 text-indigo-400 shrink-0 mt-1" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm">{suggestion.title}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-2">{suggestion.description}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 capitalize">
+                                  {suggestion.skill}
+                                </span>
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-white/10">
+                                  {suggestion.size}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label>Title *</Label>
                 <Input placeholder="e.g., Morning workout" value={title} onChange={e => setTitle(e.target.value)} />
