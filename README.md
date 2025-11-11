@@ -29,7 +29,7 @@ Transform your daily habits into an epic RPG adventure with AI-powered coaching!
 ### Installation
 
 1. **Clone the repository**
-```bash
+```bash 
 git clone https://github.com/abhi3114-glitch/GAMILFY.git
 cd GAMILFY
 ```
